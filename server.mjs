@@ -24,4 +24,4 @@ axios.get('https://api.websitecarbon.com/site?url=https://green-to-go.vercel.app
 createServer((req, res) => {
   res.write(JSON.stringify(data));
   res.end();
-}).listen(process.env.PORT || 8080);
+}).listen(process.env.PORT);
