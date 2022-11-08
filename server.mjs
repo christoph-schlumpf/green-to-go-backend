@@ -22,6 +22,8 @@ axios.get('https://api.websitecarbon.com/site?url=https://green-to-go.vercel.app
 
 
 createServer((req, res) => {
+  res.setHeader("Access-Control-Allow-Origin", "*");
+  res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
   res.write(JSON.stringify(data));
   res.end();
-}).listen(process.env.PORT);
+}).listen(process.env.PORT)

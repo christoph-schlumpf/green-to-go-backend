@@ -5,8 +5,7 @@
   "author": "Aiden Bai",
   "license": "MIT",
   "scripts": {
-    "start": "node server.mjs",
-    "start-local": "PORT=8080 node server.mjs"
+    "start": "node server.mjs"
   },
   "dependencies": {
     "@tgwf/co2": "^0.11.3",
