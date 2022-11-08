@@ -26,4 +26,4 @@ createServer((req, res) => {
   res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
   res.write(JSON.stringify(data));
   res.end();
-}).listen(process.env.PORT)
+}).listen(process.env.PORT || 8080)
