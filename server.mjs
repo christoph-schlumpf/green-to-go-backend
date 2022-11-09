@@ -55,6 +55,6 @@ createServer((req, res) => {
       "carbonPowerBreakdown": dataCarbonPowerBreakdown,
       "websiteCarbon": dataWebsitecarbon
   };
-  res.write(JSON.stringify(result));
+  res.write(JSON.stringify(result, null, 4));
   res.end();
 }).listen(process.env.PORT || 8080)
