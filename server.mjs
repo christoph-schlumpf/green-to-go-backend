@@ -23,6 +23,8 @@ var dataCarbonIntensityHistory
 const getData = () => {
     const randomNumber = Math.random();
 
+    console.log("getData: " + new Date())
+
     axios.get('https://api.websitecarbon.com/site?url=https://green-to-go.vercel.app?' + randomNumber)
       .then(function (response) {
         console.log(response.data);
