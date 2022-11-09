@@ -8,9 +8,12 @@ const apiKeyElectricityMap = 'gpdq4kPznyvfeO31MlbBEdlnputaMnik';
 const apiHeaderElectricityMap = { 'X-BLOBR-KEY': apiKeyElectricityMap };
 const baseUrlElectricityMap = 'https://api-access.electricitymaps.com/tw0j3yl62nfpdjv4';
 
-console.log("Loading...");
+const randomNumber = Math.random();
 
-var dataWebsitecarbonGreen
+console.log("Loading... " + randomNumber);
+
+var dataWebsitecarbonEco
+var dataWebsitecarbon
 
 
 var dataCarbonPowerBreakdown
@@ -20,17 +23,27 @@ var dataCarbonIntensityForecast
 var dataCarbonIntensityHistory
 
 
-axios.get('https://api.websitecarbon.com/site?url=https://green-to-go.vercel.app')
+axios.get('https://api.websitecarbon.com/site?url=https://green-to-go.vercel.app?' + randomNumber)
   .then(function (response) {
     console.log(response.data);
     console.log(response.data.statistics.co2.grid);
-    console.log(response.data.statistics.co2.renewable);
     const estimatedCO2 = co2Emission.perByte(response.data.bytes, false);
-    dataWebsitecarbonGreen = response.data.statistics.co2.grid;
+    dataWebsitecarbon = response.data.statistics.co2.grid;
   })
   .catch(function (error) {
     console.log(error);
   });
+
+axios.get('https://api.websitecarbon.com/site?url=https://green-to-go.vercel.app?eco' + randomNumber)
+    .then(function (response) {
+      console.log(response.data);
+      console.log(response.data.statistics.co2.grid);
+      const estimatedCO2 = co2Emission.perByte(response.data.bytes, false);
+      dataWebsitecarbonEco = response.data.statistics.co2.grid;
+    })
+    .catch(function (error) {
+      console.log(error);
+    });
 
 axios({
     method: 'get',
@@ -97,7 +110,9 @@ createServer((req, res) => {
       "carbonIntensityHistory": dataCarbonIntensityHistory,
       "carbonPowerBreakdown": dataCarbonPowerBreakdown,
       "carbonPowerBreakdownHistory": dataCarbonPowerBreakdownHistory,
-      "websiteGreenCarbon": dataWebsitecarbonGreen
+      "websiteCarbon": dataWebsitecarbon,
+      "websiteCarbonEco": dataWebsitecarbonEco,
+      "websiteCarbonEcoImprovementFactor": dataWebsitecarbon && dataWebsitecarbonEco ? dataWebsitecarbon.grams / dataWebsitecarbonEco.grams : undefined
   };
   res.write(JSON.stringify(result, null, 4));
   res.end();
