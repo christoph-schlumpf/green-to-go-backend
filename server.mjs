@@ -4,13 +4,21 @@ import axios from 'axios';
 const co2Emission = new co2();
 const greenHost = true // Is the data transferred from a green host?
 
+const apiKeyElectricityMap = 'gpdq4kPznyvfeO31MlbBEdlnputaMnik';
+const apiHeaderElectricityMap = { 'X-BLOBR-KEY': apiKeyElectricityMap };
+const baseUrlElectricityMap = 'https://api-access.electricitymaps.com/tw0j3yl62nfpdjv4';
 
 console.log("Loading...");
 
-var dataWebsitecarbon
+var dataWebsitecarbonGreen
 
-var dataCarbonIntensity
+
 var dataCarbonPowerBreakdown
+var dataCarbonPowerBreakdownHistory
+var dataCarbonIntensity
+var dataCarbonIntensityForecast
+var dataCarbonIntensityHistory
+
 
 axios.get('https://api.websitecarbon.com/site?url=https://green-to-go.vercel.app')
   .then(function (response) {
@@ -18,7 +26,7 @@ axios.get('https://api.websitecarbon.com/site?url=https://green-to-go.vercel.app
     console.log(response.data.statistics.co2.grid);
     console.log(response.data.statistics.co2.renewable);
     const estimatedCO2 = co2Emission.perByte(response.data.bytes, false);
-    dataWebsitecarbon = response.data.statistics.co2.grid;
+    dataWebsitecarbonGreen = response.data.statistics.co2.grid;
   })
   .catch(function (error) {
     console.log(error);
@@ -26,8 +34,8 @@ axios.get('https://api.websitecarbon.com/site?url=https://green-to-go.vercel.app
 
 axios({
     method: 'get',
-    url: 'https://api-access.electricitymaps.com/tw0j3yl62nfpdjv4/power-breakdown/latest?zone=CH',
-    headers: { 'X-BLOBR-KEY': 'gpdq4kPznyvfeO31MlbBEdlnputaMnik' }
+    url: `${baseUrlElectricityMap}/power-breakdown/latest?zone=CH`,
+    headers: apiHeaderElectricityMap
 }).then(function (response) {
     console.log(response.data);
     dataCarbonPowerBreakdown = response.data;
@@ -37,11 +45,44 @@ axios({
 
 axios({
     method: 'get',
-    url: 'https://api-access.electricitymaps.com/tw0j3yl62nfpdjv4/carbon-intensity/latest?zone=CH',
-    headers: { 'X-BLOBR-KEY': 'gpdq4kPznyvfeO31MlbBEdlnputaMnik' }
+    url: `${baseUrlElectricityMap}/power-breakdown/history?zone=CH`,
+    headers: apiHeaderElectricityMap
+}).then(function (response) {
+    console.log(response.data);
+    dataCarbonPowerBreakdownHistory = response.data;
+}).catch(function (error) {
+    console.log(error);
+});
+
+axios({
+    method: 'get',
+    url: `${baseUrlElectricityMap}/carbon-intensity/latest?zone=CH`,
+    headers: apiHeaderElectricityMap
 }).then(function (response) {
     console.log(response.data);
     dataCarbonIntensity = response.data;
+}).catch(function (error) {
+    console.log(error);
+});
+
+axios({
+    method: 'get',
+    url: `${baseUrlElectricityMap}/carbon-intensity/forecast?zone=CH`,
+    headers: apiHeaderElectricityMap
+}).then(function (response) {
+    console.log(response.data);
+    dataCarbonIntensityForecast = response.data;
+}).catch(function (error) {
+    console.log(error);
+});
+
+axios({
+    method: 'get',
+    url: `${baseUrlElectricityMap}/carbon-intensity/history?zone=CH`,
+    headers: apiHeaderElectricityMap
+}).then(function (response) {
+    console.log(response.data);
+    dataCarbonIntensityHistory = response.data;
 }).catch(function (error) {
     console.log(error);
 });
@@ -52,8 +93,11 @@ createServer((req, res) => {
   res.setHeader("Content-Type", "application/json");
   var result = {
       "carbonIntensity" : dataCarbonIntensity,
+      "carbonIntensityForecast": dataCarbonIntensityForecast,
+      "carbonIntensityHistory": dataCarbonIntensityHistory,
       "carbonPowerBreakdown": dataCarbonPowerBreakdown,
-      "websiteCarbon": dataWebsitecarbon
+      "carbonPowerBreakdownHistory": dataCarbonPowerBreakdownHistory,
+      "websiteGreenCarbon": dataWebsitecarbonGreen
   };
   res.write(JSON.stringify(result, null, 4));
   res.end();
