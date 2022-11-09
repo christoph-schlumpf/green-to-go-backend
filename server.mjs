@@ -8,9 +8,7 @@ const apiKeyElectricityMap = 'gpdq4kPznyvfeO31MlbBEdlnputaMnik';
 const apiHeaderElectricityMap = { 'X-BLOBR-KEY': apiKeyElectricityMap };
 const baseUrlElectricityMap = 'https://api-access.electricitymaps.com/tw0j3yl62nfpdjv4';
 
-const randomNumber = Math.random();
-
-console.log("Loading... " + randomNumber);
+console.log("Loading... ");
 
 var dataWebsitecarbonEco
 var dataWebsitecarbon
@@ -22,83 +20,94 @@ var dataCarbonIntensity
 var dataCarbonIntensityForecast
 var dataCarbonIntensityHistory
 
+const getData = () => {
+    const randomNumber = Math.random();
 
-axios.get('https://api.websitecarbon.com/site?url=https://green-to-go.vercel.app?' + randomNumber)
-  .then(function (response) {
-    console.log(response.data);
-    console.log(response.data.statistics.co2.grid);
-    const estimatedCO2 = co2Emission.perByte(response.data.bytes, false);
-    dataWebsitecarbon = response.data.statistics.co2.grid;
-  })
-  .catch(function (error) {
-    console.log(error);
-  });
+    axios.get('https://api.websitecarbon.com/site?url=https://green-to-go.vercel.app?' + randomNumber)
+      .then(function (response) {
+        console.log(response.data);
+        console.log(response.data.statistics.co2.grid);
+        const estimatedCO2 = co2Emission.perByte(response.data.bytes, false);
+        dataWebsitecarbon = response.data.statistics.co2.grid;
+      })
+      .catch(function (error) {
+        console.log(error);
+      });
 
-axios.get('https://api.websitecarbon.com/site?url=https://green-to-go.vercel.app?eco' + randomNumber)
-    .then(function (response) {
-      console.log(response.data);
-      console.log(response.data.statistics.co2.grid);
-      const estimatedCO2 = co2Emission.perByte(response.data.bytes, false);
-      dataWebsitecarbonEco = response.data.statistics.co2.grid;
-    })
-    .catch(function (error) {
-      console.log(error);
-    });
+    axios.get('https://api.websitecarbon.com/site?url=https://green-to-go.vercel.app?eco' + randomNumber)
+        .then(function (response) {
+          console.log(response.data);
+          console.log(response.data.statistics.co2.grid);
+          const estimatedCO2 = co2Emission.perByte(response.data.bytes, false);
+          dataWebsitecarbonEco = response.data.statistics.co2.grid;
+        })
+        .catch(function (error) {
+          console.log(error);
+        });
 
-axios({
-    method: 'get',
-    url: `${baseUrlElectricityMap}/power-breakdown/latest?zone=CH`,
-    headers: apiHeaderElectricityMap
-}).then(function (response) {
-    console.log(response.data);
-    dataCarbonPowerBreakdown = response.data;
-}).catch(function (error) {
+    axios({
+        method: 'get',
+        url: `${baseUrlElectricityMap}/power-breakdown/latest?zone=CH`,
+        headers: apiHeaderElectricityMap
+    }).then(function (response) {
+        console.log(response.data);
+        dataCarbonPowerBreakdown = response.data;
+    }).catch(function (error) {
+            console.log(error);
+        });
+
+    axios({
+        method: 'get',
+        url: `${baseUrlElectricityMap}/power-breakdown/history?zone=CH`,
+        headers: apiHeaderElectricityMap
+    }).then(function (response) {
+        console.log(response.data);
+        dataCarbonPowerBreakdownHistory = response.data;
+    }).catch(function (error) {
         console.log(error);
     });
 
-axios({
-    method: 'get',
-    url: `${baseUrlElectricityMap}/power-breakdown/history?zone=CH`,
-    headers: apiHeaderElectricityMap
-}).then(function (response) {
-    console.log(response.data);
-    dataCarbonPowerBreakdownHistory = response.data;
-}).catch(function (error) {
-    console.log(error);
-});
+    axios({
+        method: 'get',
+        url: `${baseUrlElectricityMap}/carbon-intensity/latest?zone=CH`,
+        headers: apiHeaderElectricityMap
+    }).then(function (response) {
+        console.log(response.data);
+        dataCarbonIntensity = response.data;
+    }).catch(function (error) {
+        console.log(error);
+    });
 
-axios({
-    method: 'get',
-    url: `${baseUrlElectricityMap}/carbon-intensity/latest?zone=CH`,
-    headers: apiHeaderElectricityMap
-}).then(function (response) {
-    console.log(response.data);
-    dataCarbonIntensity = response.data;
-}).catch(function (error) {
-    console.log(error);
-});
+    axios({
+        method: 'get',
+        url: `${baseUrlElectricityMap}/carbon-intensity/forecast?zone=CH`,
+        headers: apiHeaderElectricityMap
+    }).then(function (response) {
+        console.log(response.data);
+        dataCarbonIntensityForecast = response.data;
+    }).catch(function (error) {
+        console.log(error);
+    });
 
-axios({
-    method: 'get',
-    url: `${baseUrlElectricityMap}/carbon-intensity/forecast?zone=CH`,
-    headers: apiHeaderElectricityMap
-}).then(function (response) {
-    console.log(response.data);
-    dataCarbonIntensityForecast = response.data;
-}).catch(function (error) {
-    console.log(error);
-});
+    axios({
+        method: 'get',
+        url: `${baseUrlElectricityMap}/carbon-intensity/history?zone=CH`,
+        headers: apiHeaderElectricityMap
+    }).then(function (response) {
+        console.log(response.data);
+        dataCarbonIntensityHistory = response.data;
+    }).catch(function (error) {
+        console.log(error);
+    });
+}
 
-axios({
-    method: 'get',
-    url: `${baseUrlElectricityMap}/carbon-intensity/history?zone=CH`,
-    headers: apiHeaderElectricityMap
-}).then(function (response) {
-    console.log(response.data);
-    dataCarbonIntensityHistory = response.data;
-}).catch(function (error) {
-    console.log(error);
-});
+getData();
+
+const timeout = 1000*60*10
+
+setTimeout(getData, timeout)
+
+
 
 createServer((req, res) => {
   res.setHeader("Access-Control-Allow-Origin", "*");
